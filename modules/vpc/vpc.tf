@@ -1,16 +1,4 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
 
-# Configure the AWS Provider
-provider "aws" {
-  region = "us-east-1"
-}
 
 resource "aws_vpc" "my_vpc" {
   cidr_block = "10.0.0.0/16"
@@ -37,8 +25,8 @@ resource "aws_route_table" "route_main" {
   }
 
   route {
-    ipv6_cidr_block        = "::/0"
-    egress_only_gateway_id = aws_internet_gateway.gw.id
+    ipv6_cidr_block = "::/0"
+    gateway_id      = aws_internet_gateway.gw.id
   }
 
   tags = {
@@ -48,11 +36,11 @@ resource "aws_route_table" "route_main" {
 
 resource "aws_subnet" "my-subnet-1" {
   vpc_id            = aws_vpc.my_vpc.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
+  cidr_block        = var.subnet_prefix[0].cidr_block
+  availability_zone = var.availability_zone
 
   tags = {
-    Name = "prod-subnet"
+    Name = var.subnet_prefix[0].name
   }
 }
 
@@ -72,7 +60,7 @@ resource "aws_security_group" "allow_web" {
     to_port          = 443
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
+    ipv6_cidr_blocks = [aws_vpc.my_vpc.ipv6_cidr_block]
   }
 
   ingress {
@@ -81,7 +69,7 @@ resource "aws_security_group" "allow_web" {
     to_port          = 80
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
+    ipv6_cidr_blocks = [aws_vpc.my_vpc.ipv6_cidr_block]
   }
 
   ingress {
@@ -90,7 +78,7 @@ resource "aws_security_group" "allow_web" {
     to_port          = 22
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
+    ipv6_cidr_blocks = [aws_vpc.my_vpc.ipv6_cidr_block]
   }
 
   egress {
