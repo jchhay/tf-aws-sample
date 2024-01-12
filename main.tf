@@ -9,9 +9,9 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
+  alias  = "use1"
   region = "us-east-1"
 }
-
 
 locals {
   http_port    = 80
@@ -26,6 +26,10 @@ module "my_vpc" {
 
   availability_zone = "us-east-1a"
   subnet_prefix     = var.subnet_prefix
+
+  providers = {
+    aws = aws.use1
+  }
 }
 
 module "my_ec2" {
@@ -37,6 +41,8 @@ module "my_ec2" {
   security_group_id = module.my_vpc.security_group_id
   subnet_id         = module.my_vpc.subnet_id
 
-
+  providers = {
+    aws = aws.use1
+  }
 
 }
