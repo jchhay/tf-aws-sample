@@ -5,9 +5,18 @@ terraform {
       version = "~> 5.0"
     }
   }
+
+  # Configure remote state file store in s3 and locking mechanism using dynamodb
+  # backend "s3" {
+  #   bucket = "XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+  #   key    = "tf-infra-dev/terraform.tfstate"
+  #   region = "us-east-1"
+  #   dynamodb_table = "terraform-state-locking"
+  #   encrypt = true
+  # }
 }
 
-# Configure the AWS Provider
+# Configure the AWS Provider plug-in so we can interact with AWS API
 provider "aws" {
   alias  = "use1"
   region = "us-east-1"
