@@ -28,6 +28,8 @@ locals {
   any_protocol = "-1"
   tcp_protocol = "tcp"
   all_ips      = ["0.0.0.0/0"]
+  vpc_cidr     = "10.0.0.0/16"
+
 }
 
 module "my_vpc" {
@@ -35,6 +37,7 @@ module "my_vpc" {
 
   availability_zone = "us-east-1a"
   subnet_prefix     = var.subnet_prefix
+  vpc_cidr          = local.vpc_cidr
 
   providers = {
     aws = aws.use1
@@ -54,4 +57,14 @@ module "my_ec2" {
     aws = aws.use1
   }
 
+}
+
+module "my_postgres" {
+  source = "./modules/rds"
+
+  db_user = var.db_user
+
+  providers = {
+    aws = aws.use1
+  }
 }
